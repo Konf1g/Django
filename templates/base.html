@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+{% load staticfiles %}
+<head>
+
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+        <!— Bootstrap core CSS —>
+{#    <link rel="stylesheet" href={% static "library/bootstrap.min.css" %} >#}
+   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0-beta.2/lux/bootstrap.min.css" rel="stylesheet" integrity="sha384-CF64UnUzxV691sOmqagn+TQJmesKn1fgsYmlIPqYB5nm0m32jYo3LiX1BcrbuESZ" crossorigin="anonymous">
+    <style type="text/css">
+        .nav-item {
+        }
+
+        .msg-column{
+            border: solid 1px black;
+            width: 100%;
+            height: 300px;
+            overflow: scroll;
+        }
+
+        .Message-1{
+            background-color: #bcdff1;
+        }
+
+        .Message-2{
+            background-color: #f2f2f2;
+        }
+
+        .music{
+            margin-left: 10%;
+        }
+
+        .chat {
+            width: 70%;
+        }
+        table{
+            margin: 50px;
+        }
+        body { color: #666; font-family: sans-serif; line-height: 1.4; }
+      h1 { color: #444; font-size: 1.2em; padding: 14px 2px 12px; margin: 0px; }
+      h1 em { font-style: normal; color: #999; }
+      a { color: #888; text-decoration: none; }
+      #wrapper { width: 400px; margin: 40px auto; }
+
+      ol { padding: 0px; margin: 0px; list-style: decimal-leading-zero inside; color: #ccc; width: 460px; border-top: 1px solid #ccc; font-size: 0.9em; }
+      ol li { position: relative; margin: 0px; padding: 9px 2px 10px; border-bottom: 1px solid #ccc; cursor: pointer; }
+      ol li a { display: block; text-indent: -3.3ex; padding: 0px 0px 0px 20px; }
+      li.playing { color: #aaa; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3); }
+      li.playing a { color: #000; }
+      li.playing:before { content: '♬'; width: 14px; height: 14px; padding: 3px; line-height: 14px; margin: 0px; position: absolute; left: -24px; top: 9px; color: #000; font-size: 13px; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2); }
+
+      #shortcuts { position: fixed; bottom: 0px; width: 100%; color: #666; font-size: 0.9em; margin: 60px 0px 0px; padding: 20px 20px 15px; background: #f3f3f3; background: rgba(240, 240, 240, 0.7); }
+      #shortcuts div { width: 460px; margin: 0px auto; }
+      #shortcuts h1 { margin: 0px 0px 6px; }
+      #shortcuts p { margin: 0px 0px 18px; }
+      #shortcuts em { font-style: normal; background: #d3d3d3; padding: 3px 9px; position: relative; left: -3px;
+        -webkit-border-radius: 4px; -moz-border-radius: 4px; -o-border-radius: 4px; border-radius: 4px;
+        -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -o-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
+
+      @media screen and (max-device-width: 480px) {
+        #wrapper { position: relative; left: -3%; }
+        #shortcuts { display: none; }
+      }
+    </style>
+    <!— Custom styles for this template —>
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Главная<span class="sr-only">(current)</span></a>
+          </li>
+
+          <li class="nav-item dropdown">
+
+            <ul class="dropdown-menu" aria-labelledby="dropdown01">
+                {% for genre in genres %}
+                    <li>
+
+                    </li>
+                {% endfor %}
+            </ul>
+          </li>
+        </ul>
+                {% if user.username %}
+                    {% if user.is_superuser %}
+                        <a href='/admin' class="btn btn-link" >Admin</a>
+                    {% else %}
+                        <a href="{% url 'change_password' %}" class="btn btn-link" >Изменить пароль</a>
+                    {% endif %}
+                        <a href="{% url 'logout' %}" class="btn btn-link" >Выход({{ user.username }})</a>
+                {% else %}
+                     <a href="{% url 'login' %}" class="btn btn-link" >Вход</a>
+                     <a href="{% url 'registration' %}" class="btn btn-link">Регистрация</a>
+                {% endif %}
+      </div>
+    </nav>
+
+
+          <div>
+             {% block content %}{% endblock %}
+             {% block login %}{% endblock %}
+          </div>
+<!— /.container —>
+
+
+    <!— Bootstrap core JavaScript
+    ================================================== —>
+    <!— Placed at the end of the document so the pages load faster —>
+
+{#    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>#}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+</body>
+</html>

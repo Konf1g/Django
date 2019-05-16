@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    Главная
+{% endblock %}
+
+{% block content %}
+<script src= {% static "js/jquery-3.2.1.js" %}></script>
+<script src= {% static 'js/audio.min.js' %}></script>
+    <script>
+  audiojs.events.ready(function() {
+    var as = audiojs.createAll();
+  });
+</script>
+<script>
+        function poll() { //поллинг - функция, которая через каждую секунду спращивает у сервера "есть че новенького?"
+            setTimeout(function () {
+                $.ajax({
+                        type: "GET",
+                        url: "ajax_comments/", //урл
+                        data:{},
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#msg-column').html(data);
+                        },
+                        complete: poll,
+                        timeout: 1000
+                    });
+            }, 1000)
+        }
+
+        //поиск
+        $(document).ready(function () {
+            $('#search_btn').click(function () {
+                var text = document.getElementById('search');
+                $.ajax({
+                    method: "GET",
+                    url: "search/",
+                    dataType: 'html',
+                    data: ({'text': text.value}),
+                    success: function (data) {
+                        $('#search').val('');
+                        $('#music_list').html(data)
+                    }
+                })
+            })
+
+
+            //отправка сообщений
+            $('#send').click(function () {
+                var txt = document.getElementById('text');
+                $.ajax({
+                    method: "GET",
+                    url: "send_msg/", //урл
+                    dataType: 'html',
+                    data: ({'text': txt.value}),
+                    success: function () {
+                        $('#text').val('');
+                        document.getElementById('msg-column').scrollTop = 9999;
+                    }
+                })
+            });
+
+            //первая загрузка сообщений из чата
+            setTimeout(function () {
+                document.getElementById('msg-column').scrollTop = 9999;
+            },100)
+            $.ajax({
+                type: "GET",
+                url: "ajax_comments/", //урл
+                data:{},
+                dataType: 'html',
+                success: function (data) {
+                    $('#msg-column').html(data);
+                }
+            });
+            poll();
+        });
+    </script>
+    <script>
+      $(function() {
+        // Setup the player to autoplay the next track
+        var a = audiojs.createAll({
+          trackEnded: function() {
+            var next = $('ol li.playing').next();
+            if (!next.length) next = $('ol li').first();
+            next.addClass('playing').siblings().removeClass('playing');
+            audio.load($('a', next).attr('data-src'));
+            audio.play();
+          }
+        });
+
+        // Load in the first track
+        var audio = a[0];
+            first = $('ol a').attr('data-src');
+        $('ol li').first().addClass('playing');
+        audio.load(first);
+
+        // Load in a track on click
+        $('ol li').click(function(e) {
+          e.preventDefault();
+          $(this).addClass('playing').siblings().removeClass('playing');
+          audio.load($('a', this).attr('data-src'));
+          audio.play();
+        });
+        // Keyboard shortcuts
+        $(document).keydown(function(e) {
+          var unicode = e.charCode ? e.charCode : e.keyCode;
+             // right arrow
+          if (unicode == 39) {
+            var next = $('li.playing').next();
+            if (!next.length) next = $('ol li').first();
+            next.click();
+            // back arrow
+          } else if (unicode == 37) {
+            var prev = $('li.playing').prev();
+            if (!prev.length) prev = $('ol li').last();
+            prev.click();
+            // spacebar
+          } else if (unicode == 32) {
+            audio.playPause();
+          }
+        })
+      });
+    </script>
+    <div>
+    <div>
+
+	<ul >
+
+		<li >
+        <br>
+        <br>
+
+         {% if user.username %}
+            <p align="center">Добро Пожаловать, {{ user.username }}</p>
+        {% else %}
+             <p align="center">Добро Пожаловать!</p>
+        {% endif %}
+        <br>
+        <br>
+            {% if user.username %}
+            <a href="{% url 'logout' %}" ></a>
+        {% else %}
+                <p align="center"> <a href="{% url 'login' %}"  >Войдите</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;или&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 <a href="{% url 'registration' %}" >Зарегистрируйтесь</a></p>
+        {% endif %}
+    </li>
+
+		<li class="carousel-item carousel-item-red"><div class="block">
+             <br>
+
+        <br>
+        <br>
+ </div></li>
+
+	</ul>
+    <table>
+    <td>
+    <div class="music">
+        <form id="search_form" method="POST" action="">
+            {% csrf_token %}
+            <input type="text" name="search" id='search' style="width: 80%">
+            <input type="button" name="search_btn" id="search_btn" value="Search">
+        </form>
+        <br>
+        <br>
+        <div>
+        <audio preload></audio>
+            <ol id="music_list">
+            {% for music in musics %}
+                <li><a href="#" data-src='static/media/{{ music.upload }}'>{{ music.title }}</a></li>
+                    <br>
+            {% endfor %}
+            </ol>
+        </div>
+    </div>
+    </td>
+    <td class="chat">
+    <div style="margin-left: 50%">
+        <div class="msg-column", id="msg-column">
+
+        </div>
+        <br>
+        <form id='form' action="" method="POST" >
+            {% csrf_token %}
+            <input type="text" name="text" id="text" style="width: 330px">
+            <input type="button" value="Send!" id="send" class="send" height="50px">
+        </form>
+        <div id="out"></div>
+    </div>
+    </td>
+    </table>
+</div>
+</div>
+{% endblock %}
